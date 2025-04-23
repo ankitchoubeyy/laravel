@@ -193,9 +193,36 @@ public function aboutPage(){
 </ul>
 ```
 
-
-
 ### What is Blade?
+Blade is the powerful templating engine that comes built into Laravel, a popular PHP framework. It makes working with views much more flexible and readable by allowing developers to write clean and efficient template files using its simple yet robust syntax.
+
+Unlike plain PHP, Blade provides features like:
+- **Template Inheritance** – Define a layout file and extend it in other views.  
+- **Control Structures** – Use `@if`, `@foreach`, `@switch`, and other directives instead of traditional PHP syntax.  
+- **Components & Slots** – Reusable template elements for modular design.  
+- **Directives** – Customizable shortcuts that simplify coding.  
+
+Blade templates are compiled into plain PHP, ensuring they run fast while keeping code neat and maintainable.
+
+## Reducing Duplication in Blade
+Go to `views` directory create `views/components/layout.blade.php`
+
+1. Write all your header/footer or common code in `layout.blade.php` file.
+2. Use Slot `{{ $slot }}` for rendering other dynamic files.
+
+```html
+<header>This is a Header</header>
+{{$slot}} <!-- for rendering the dynamic pages -->
+<footer>This is a footer</footer>
+```
+
+3. Go to your desired view and wrap up all your content inside the special tag given below.
+```html
+<x-layout>
+    Page content with similar header and footer.
+</x-layout>
+```
+
 
 
 
