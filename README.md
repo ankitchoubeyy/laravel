@@ -129,14 +129,73 @@ Route::get('/about', [ourMainController::class, "aboutPage"] );
 
 ---
 
-# View and Blade
+## View and Blade
 
-## What is View?
-Vi
+### What is View?
+A **View** in Laravel represents the presentation layer of the application. It separates the HTML/UI logic from business logic and is responsible for displaying data to users.
+
+### Steps to create view and use them
+1. Create view inside `resources/views/home.blade.php`. Define your content
+2. Map your view with controller. example:
+```php
+public function homePage(){
+        return view("home");
+    }
+```
+
+### How to write dynamic/php a content in blade template engine?
+For dynamic content use : `{{ }}`
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Our Main App</title>
+</head>
+<body>
+    <h1>Home page</h1>
+    <!-- {{ }} used to fetch dynamic/php content. -->
+    <p>The current year is: {{date('Y')}}</p>
+    <a href="/about">Go to About</a>
+</body>
+</html>
+```
+
+### How to pass data in blade from controller?
+1. Pass the data from the controller
+- data must be passed in the ***assosciative array***
+```php
+public function homePage(){
+        $name = 'Aman';
+        return view("home", ['name' => $name]);
+}
+```
+
+- How to send the list of data
+```php
+public function aboutPage(){
+        $animalsList = ['lion', 'Tiger', 'Elephant'];
+        return view("about", ['animals' => $animalsList]);
+    }
+```
+
+2. Display the data from.
+```html
+<h2>Your name: {{$name}}</h2>
+
+<!-- Fetching list values -->
+<ul>
+    @foreach ($animals as $animal)
+        <li>{{$animal}}</li>
+    @endforeach
+</ul>
+```
 
 
 
-## What is Blade?
+### What is Blade?
 
 
 
