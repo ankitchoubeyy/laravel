@@ -23,7 +23,7 @@ echo "Hello $name Your age is $age"; // Hello Ankit Your age is 22
 
 - Commands to start php localhost: `php -S localhost:8000`
 
-# Composer
+## Composer
 It is a **package** or **dependancy** manager for PHP, just like `npm` exsist for `node.js`.
 
 - How to install it in fedora?  
@@ -65,7 +65,7 @@ php artisan serve
 
 ---
 
-### Routes and URLs
+## Routes and URLs
 Define routes in `routes/web.php`
 
 ```php
@@ -80,13 +80,13 @@ Route::get('/about', function(){
 ```
 
 ---
-# Controllers
+## Controllers
 
 
-## What are Controllers?
+### What are Controllers?
 Controllers in Laravel handle application logic, acting as intermediaries between **Models** (data) and **Views** (UI). They organize HTTP request handling into reusable classes.
 
-## Steps to Create & Use Controllers
+### Steps to Create & Use Controllers
 
 ### 1. Create a Controller : using Artisan Command
 ```bash
