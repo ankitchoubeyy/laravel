@@ -223,6 +223,20 @@ Go to `views` directory create `views/components/layout.blade.php`
 </x-layout>
 ```
 
+---
+
+# Section - 3 (Databse)
+- set up db connection in `.env`
+- After that migrate your laravel tables in into your mysql db.
+```bash
+php artisan migrate
+``` 
+
+- If you've modified your laravel tables then in that case you need to re-migrate it.
+```bash
+php artisan migrate:fresh
+```
+
 
 
 
