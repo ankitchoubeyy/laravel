@@ -21,4 +21,27 @@ class UserController extends Controller
 
         return "User registered successully";
     }
+    public function login(Request $request)
+    {
+        $incomingFields = $request->validate([
+            'loginusername' => 'required',
+            'loginpassword' => 'required',
+        ]);
+
+        if(auth()->attempt(['username' => $incomingFields['loginusername'], 'password' => $incomingFields['loginpassword']])) {
+            $request->session()->regenerate();
+            return "Login Successful";
+        }
+        else {
+            return "Login failed";
+        }
+    }
+
+    public function showCorrectHomePage(Request $request) {
+        if (auth()->check()) {
+            return view('homeFeed');
+        } else {
+            return view('home');
+        }
+    }
 }
