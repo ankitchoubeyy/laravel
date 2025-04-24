@@ -368,6 +368,187 @@ public function logout() {
 }
 ```
 
+# Section-5 (Blog)
+
+### To create a table (migration table)
+```bash
+php artisan make:migration crete_post_table
+```
+
+### To create a model in laravel
+```bash
+# php artisan make:model modeName
+php artisan make:model Blog
+```
+
+---
+
+## How to store Data from forms to DB?
+Storing data from a form to a database in Laravel involves several steps. Here’s a simple guide to doing it properly:
+
+### **Step 1: Set Up Database Configuration**
+Ensure your `.env` file has correct database settings:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
+
+Run the command:
+
+```sh
+php artisan config:clear
+php artisan cache:clear
+```
+
+### **Step 2: Create a Migration**
+Generate a migration for your table:
+
+```sh
+php artisan make:migration create_posts_table --create=posts
+```
+
+Modify the migration file (`create_posts_table.php`) inside `database/migrations`:
+
+```php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreatePostsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('content');
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('posts');
+    }
+}
+```
+
+Then, run:
+
+```sh
+php artisan migrate
+```
+
+### **Step 3: Create a Model**
+Generate a model for the `posts` table:
+
+```sh
+php artisan make:model Post
+```
+
+Modify the `Post.php` file inside `app/Models`:
+
+```php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['title', 'content'];
+}
+```
+
+### **Step 4: Create a Controller**
+Generate a controller:
+
+```sh
+php artisan make:controller PostController
+```
+
+Modify `PostController.php` inside `app/Http/Controllers`:
+
+```php
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+
+class PostController extends Controller
+{
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|min:3',
+            'content' => 'required|min:10',
+        ]);
+
+        Post::create($validatedData);
+
+        return back()->with('success', 'Post saved successfully!');
+    }
+}
+```
+
+### **Step 5: Create a Blade Form**
+Modify your Blade template (`create_post.blade.php`):
+
+```blade
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Post</title>
+</head>
+<body>
+    @if(session('success'))
+        <div style="color: green;">{{ session('success') }}</div>
+    @endif
+
+    <form action="{{ route('posts.store') }}" method="POST">
+        @csrf
+        <label for="title">Title:</label>
+        <input type="text" name="title" value="{{ old('title') }}">
+        @error('title')
+            <div style="color: red;">{{ $message }}</div>
+        @enderror
+
+        <label for="content">Content:</label>
+        <textarea name="content">{{ old('content') }}</textarea>
+        @error('content')
+            <div style="color: red;">{{ $message }}</div>
+        @enderror
+
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>
+```
+
+### **Step 6: Define Routes**
+Modify `web.php` inside `routes`:
+
+```php
+use App\Http\Controllers\PostController;
+
+Route::post('/posts/store', [PostController::class, 'store'])->name('posts.store');
+```
+
+### **Step 7: Test the Form**
+Run Laravel server:
+
+```sh
+php artisan serve
+```
+
+
 
 
 

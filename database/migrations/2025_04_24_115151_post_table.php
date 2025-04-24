@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
-        Schema::create('users', function (Blueprint $table){
-            $table->string('favoritColor');
+        // Create post table
+        Schema::create("posts", function(Blueprint $table){
+            $table->id()->primary();
+            $table->timestamps();
+            $table->string('title');
+            $table->longText('body');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
         });
     }
 
@@ -23,8 +27,6 @@ return new class extends Migration
     public function down(): void
     {
         //
-        Schema::create('users', function (Blueprint $table){
-            $table->dropColumn('favoritColor');
-        });
+        Schema::dropIfExists('posts');
     }
 };
