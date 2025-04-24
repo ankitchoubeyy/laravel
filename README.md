@@ -237,6 +237,38 @@ php artisan migrate
 php artisan migrate:fresh
 ```
 
+- If you want to make another migration file, then run the following command:
+```bash
+php artisan make:migration add_favourite_color_coloumn
+```
+> `add_favourite_color_coloumn` migration file will be created migrations.
+
+### Submitting a HTML form in DB
+0. Add `@csrf` directive inside the form.
+1. Create `POST` route.
+2. Create a controller. and define a method for handling the logic for storing the data into mysql eg:
+```bash
+php artisan make:controller controllerName
+```
+> create method
+```php
+public function register(Request $request)
+    {
+        $incomingFields = $request->validate([
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', Rules\Password::defaults()],
+        ]);
+
+        User::create($incomingFields); // storing data into User table
+
+        return "User registered successully";
+    }
+```
+3. 
+
+
+
 
 
 
