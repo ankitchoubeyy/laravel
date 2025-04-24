@@ -32,7 +32,8 @@
                             style="width: 32px; height: 32px; border-radius: 16px"
                             src="https://gravatar.com/avatar/f64fc44c03a8a7eb1d52502950879659?s=128" /></a>
                     <a class="btn btn-sm btn-success mr-2" href="#">Create Post</a>
-                    <form action="#" method="POST" class="d-inline">
+                    <form action="/logout" method="POST" class="d-inline">
+                        @csrf
                         <button class="btn btn-sm btn-secondary">Sign Out</button>
                     </form>
                 </div>
@@ -62,6 +63,13 @@
 
     {{ $slot }}
 
+    {{-- @if (auth()->has('success'))
+        <div class="container conteiner--narrow">
+            <div class="alert alert-success">
+                {{session('success')}}
+            </div>
+        </div>
+    @endif --}}
 
     <!-- footer begins -->
     <footer class="border-top text-center small text-muted py-3">

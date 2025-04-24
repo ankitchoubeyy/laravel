@@ -17,9 +17,9 @@ class UserController extends Controller
             'password' => ['required', Rules\Password::defaults()],
         ]);
 
-        User::create($incomingFields);
-
-        return "User registered successully";
+        $user = User::create($incomingFields);
+        auth()->login($user);
+        return redirect('/')->with('success', 'Successfully Registered.');
     }
     public function login(Request $request)
     {
@@ -30,11 +30,16 @@ class UserController extends Controller
 
         if(auth()->attempt(['username' => $incomingFields['loginusername'], 'password' => $incomingFields['loginpassword']])) {
             $request->session()->regenerate();
-            return "Login Successful";
+            return redirect('/')->with("success", "Logged in successfully");
         }
         else {
             return "Login failed";
         }
+    }
+
+    public function logout() {
+        auth() -> logout();
+        return redirect('/')->with("success", "Logged out successfully");
     }
 
     public function showCorrectHomePage(Request $request) {

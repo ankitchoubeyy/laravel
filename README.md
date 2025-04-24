@@ -342,10 +342,31 @@ Your Blade template (`register.blade.php`) will contain the form and logic to di
 # Section - 4 (Authentication Basics)
 
 ## Login
+```php
+public function login(Request $request)
+    {
+        $incomingFields = $request->validate([
+            'loginusername' => 'required',
+            'loginpassword' => 'required',
+        ]);
 
-
+        if(auth()->attempt(['username' => $incomingFields['loginusername'], 'password' => $incomingFields['loginpassword']])) {
+            $request->session()->regenerate();
+            return redirect('/')->with("success", "Logged in successfully");
+        }
+        else {
+            return "Login failed";
+        }
+    }
+```
 
 ## Logout
+```php
+public function logout() {
+        auth() -> logout();
+        return redirect('/')->with("success", "Logged out successfully");
+}
+```
 
 
 
