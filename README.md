@@ -564,3 +564,321 @@ public function viewSinglePost(Post $post){
 ```blade
 {!! $post->body !!}
 ```
+
+--- 
+
+## Policy in Laravel
+In Laravel, policies are a great way to handle authorization for specific models. To create a `PostPolicy` for the `Post` model, follow these steps:
+
+### **Step 1: Generate a Policy**
+Run the following command in your terminal:
+
+```bash
+php artisan make:policy PostPolicy --model=Post
+```
+
+This creates a `PostPolicy.php` file in the `app/Policies` directory.
+
+### **Step 2: Define Authorization Methods**
+Open `PostPolicy.php` and define your authorization logic. Here's an example:
+
+```php
+<?php
+
+namespace App\Policies;
+
+use App\Models\Post;
+use App\Models\User;
+
+class PostPolicy
+{
+    /**
+     * Determine if the user can view any posts.
+     */
+    public function viewAny(User $user)
+    {
+        return $user->role === 'admin';
+    }
+
+    /**
+     * Determine if the user can view a specific post.
+     */
+    public function view(User $user, Post $post)
+    {
+        return $user->id === $post->user_id || $user->role === 'admin';
+    }
+
+    /**
+     * Determine if the user can create posts.
+     */
+    public function create(User $user)
+    {
+        return $user->role === 'author' || $user->role === 'admin';
+    }
+
+    /**
+     * Determine if the user can update the post.
+     */
+    public function update(User $user, Post $post)
+    {
+        return $user->id === $post->user_id;
+    }
+
+    /**
+     * Determine if the user can delete the post.
+     */
+    public function delete(User $user, Post $post)
+    {
+        return $user->id === $post->user_id || $user->role === 'admin';
+    }
+}
+```
+
+### **Step 3: Register the Policy**
+Go to `AuthServiceProvider.php` and register the policy:
+
+```php
+use App\Models\Post;
+use App\Policies\PostPolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+
+class AuthServiceProvider extends ServiceProvider
+{
+    protected $policies = [
+        Post::class => PostPolicy::class,
+    ];
+
+    public function boot()
+    {
+        $this->registerPolicies();
+    }
+}
+```
+
+### **Step 4: Apply Policy in Controller**
+Use the `authorize` method in your controller to enforce policies:
+
+```php
+public function update(Request $request, Post $post)
+{
+    $this->authorize('update', $post);
+
+    // Update post logic
+}
+```
+
+---
+
+## Handling Image Uploads in Laravel
+
+# Handling Image Uploads in Laravel
+
+Here's a comprehensive guide to handling image uploads in Laravel:
+
+## 1. Setting Up the Form
+
+```html
+<!-- In your Blade view -->
+<form method="POST" action="{{ route('images.store') }}" enctype="multipart/form-data">
+    @csrf
+    <input type="file" name="image" accept="image/*">
+    <button type="submit">Upload</button>
+</form>
+```
+
+## 2. Creating the Route
+
+```php
+// routes/web.php
+Route::post('/images', [ImageController::class, 'store'])->name('images.store');
+```
+
+## 3. Controller Implementation
+
+```php
+// app/Http/Controllers/ImageController.php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ImageController extends Controller
+{
+    public function store(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Store the image
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public');
+            
+            // Save to database if needed
+            // $image = new Image();
+            // $image->path = $imagePath;
+            // $image->save();
+            
+            return back()->with('success', 'Image uploaded successfully!');
+        }
+
+        return back()->with('error', 'Image upload failed!');
+    }
+}
+```
+
+## 4. Displaying Uploaded Images
+
+```html
+<!-- In your Blade view -->
+@if(isset($imagePath))
+    <img src="{{ asset('storage/'.$imagePath) }}" alt="Uploaded Image">
+@endif
+```
+
+## 5. Important Configuration
+
+### Storage Link
+Run this command to create a symbolic link:
+```bash
+php artisan storage:link
+```
+
+### Filesystem Config
+Check `config/filesystems.php`:
+```php
+'disks' => [
+    'public' => [
+        'driver' => 'local',
+        'root' => storage_path('app/public'),
+        'url' => env('APP_URL').'/storage',
+        'visibility' => 'public',
+    ],
+    // ...
+],
+```
+
+## 6. Additional Tips
+
+- **Validation Options**:
+  ```php
+  'image' => 'dimensions:min_width=100,min_height=100|max:5000'
+  ```
+
+- **Custom Filenames**:
+  ```php
+  $filename = time() . '_' . $request->file('image')->getClientOriginalName();
+  $path = $request->file('image')->storeAs('images', $filename, 'public');
+  ```
+
+- **Multiple Image Uploads**:
+  ```html
+  <input type="file" name="images[]" multiple>
+  ```
+  ```php
+  foreach ($request->file('images') as $image) {
+      $image->store('images', 'public');
+  }
+  ```
+
+- **Image Intervention Package** (for image manipulation):
+  ```bash
+  composer require intervention/image
+  ```
+
+## 7. Security Considerations
+
+- Always validate file types
+- Set reasonable size limits
+- Consider scanning uploaded files for malware
+- Store files outside the public directory when sensitive
+- Use original filenames with caution (sanitize them)
+
+---
+Resizing images in Laravel using the `intervention/image` package is a great way to manipulate images efficiently. Here’s how you can install and use it:
+
+---
+
+### **Step 1: Install Intervention Image**
+Run the following command to install the package:
+
+```sh
+composer require intervention/image
+```
+
+---
+
+### **Step 2: Configure Service Provider (Laravel 9 or Earlier)**
+If you're using Laravel **9 or earlier**, register the service provider inside `config/app.php`:
+
+```php
+'providers' => [
+    Intervention\Image\ImageServiceProvider::class,
+],
+'aliases' => [
+    'Image' => Intervention\Image\Facades\Image::class,
+],
+```
+
+For **Laravel 10+,** this step is no longer needed since Laravel automatically registers the package.
+
+---
+
+### **Step 3: Resize an Image in Your Controller**
+Modify your controller to process an image upload and resize it:
+
+```php
+use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+
+public function uploadAvatar(Request $request)
+{
+    $request->validate([
+        'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    if ($request->hasFile('avatar')) {
+        $file = $request->file('avatar');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+
+        // Resize the image
+        $image = Image::make($file)->resize(200, 200)->encode('jpg');
+
+        // Store the resized image
+        Storage::put("public/avatars/{$filename}", $image->stream());
+
+        // Save file path in the database
+        auth()->user()->update(['avatar' => "avatars/{$filename}"]);
+    }
+
+    return back()->with('success', 'Avatar uploaded and resized successfully!');
+}
+```
+
+---
+
+### **Step 4: Display the Resized Image**
+Make sure to display the resized image correctly in your Blade template:
+
+```blade
+<img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" width="200">
+```
+
+If your storage link isn’t working, run:
+
+```sh
+php artisan storage:link
+```
+
+---
+
+### **Bonus: Advanced Image Manipulation**
+You can enhance the image further by applying filters:
+
+```php
+$image = Image::make($file)
+    ->resize(200, 200)
+    ->greyscale()
+    ->blur(5);
+```

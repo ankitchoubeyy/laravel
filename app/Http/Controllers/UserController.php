@@ -28,25 +28,35 @@ class UserController extends Controller
             'loginpassword' => 'required',
         ]);
 
-        if(auth()->attempt(['username' => $incomingFields['loginusername'], 'password' => $incomingFields['loginpassword']])) {
+        if (auth()->attempt(['username' => $incomingFields['loginusername'], 'password' => $incomingFields['loginpassword']])) {
             $request->session()->regenerate();
             return redirect('/')->with("success", "Logged in successfully");
-        }
-        else {
+        } else {
             return "Login failed";
         }
     }
 
-    public function logout() {
-        auth() -> logout();
+    public function logout()
+    {
+        auth()->logout();
         return redirect('/')->with("success", "Logged out successfully");
     }
 
-    public function showCorrectHomePage(Request $request) {
+    public function showCorrectHomePage(Request $request)
+    {
         if (auth()->check()) {
             return view('homeFeed');
         } else {
             return view('home');
         }
+    }
+
+    public function profile(User $user)
+    {
+    //     echo $user->username;
+    //     die;
+        $user = User::find(auth()->user()->id);
+        // return $user->posts()->get();
+        return view('profilePost', ['username' => $user->username, 'posts' => $user->posts()->latest()->get(), 'postCount' => $user->posts()->count()]);
     }
 }
