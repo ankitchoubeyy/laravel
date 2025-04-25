@@ -548,13 +548,19 @@ Run Laravel server:
 php artisan serve
 ```
 
+---
 
+### Adding markdown Support
+- Go to controller, and use **Str** method.
+```php
+public function viewSinglePost(Post $post){
+        $post['body'] = Str::markdown($post->body);
+        return view('singlePost', ['post' => $post]);
+}
+```
 
+- Then go to page which showing the html file, use single curly braces instead of double and also add two exclamation mark in the begining and at end.
 
-
-
-
-
-
-
-
+```blade
+{!! $post->body !!}
+```

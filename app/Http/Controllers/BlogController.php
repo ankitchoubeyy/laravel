@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
@@ -22,14 +23,13 @@ class BlogController extends Controller
         $incomingFields['body'] = strip_tags($incomingFields['body']);
         $incomingFields['user_id'] = auth()->id();
 
-        Post::create($incomingFields);
-        return redirect("/");
+        $newPost = Post::create($incomingFields);
+        return redirect("/post/{$newPost->id}");
     }
 
     public function viewSinglePost(Post $post){
-        $title = $post->title;
-        $body = $post->body;
-        return view('singlePost', ['title' => $title, 'body' => $body]);
+        $post['body'] = Str::markdown($post->body);
+        return view('singlePost', ['post' => $post]);
     }
 
 }
